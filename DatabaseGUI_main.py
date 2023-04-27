@@ -4,15 +4,15 @@ DATABASE MANAGEMENT SYSTEM
 Features -
  - Nested Filter with exports
  - Department filter using multithreading
- - Inheritance used for TeacherDatabaseGUI
- - Addition/Modification in database won't rewrite old backup.
- - Filter search optimised using threading (to be implemented)
+ - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI
+ - Addition/Modification of data won't rewrite old backup.
+ - Filter search optimised using threading (partially implemented in Department filter)
  - cache generated during runtime for ease of multithreading (to be implemented)
 
 UPDATES - 
 v2.2
 	- Optimisation in filter and attribute_checker
-	
+
 v2.1
 	- Bug fix
     - Asthetics
@@ -124,7 +124,7 @@ class CreditsWindowGUI:
         self.master.geometry('800x400')
         self.canvas = tk.Canvas(self.master, width=800, height=400)
         self.canvas.pack()
-        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI\n - Addition/Modification in database won't rewrite old backup.\n - Filter search optimised using threading (to be implemented)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation"
+        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation"
         self.text_obj = None
         self.after_id = None
         self.y_pos = 500
@@ -1098,4 +1098,4 @@ if __name__=='__main__':
         my_gui = Database_Manager_GUI(root)
         root.mainloop()
 
-        # shutil.rmtree('./.cache')               # uncomment to delete cache after each use
+        shutil.rmtree('./.cache')               # uncomment to delete cache after each use
