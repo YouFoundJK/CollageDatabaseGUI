@@ -6,14 +6,19 @@ Features -
  - Department filter using multithreading
  - Inheritance used for TeacherDatabaseGUI
  - Addition/Modification in database won't rewrite old backup.
- - Filter search optimised using threading (not implemented yet)
- - cache generated during runtime for ease of multithreading (not implemented yet)
+ - Filter search optimised using threading (to be implemented)
+ - cache generated during runtime for ease of multithreading (to be implemented)
 
 UPDATES - 
 
-v2.0
+v2.1
 	- Bug fix
-	
+    - Asthetics
+    - Credits 
+
+v2.0
+	- Bug fix and optimisation
+
 '''
 
 import os
@@ -625,7 +630,7 @@ class DepartmentDatabaseGUI:
 		self.button_pressed.set(110)
 		self.main_window.destroy()
 
-class Database_Manager:
+class Database_Manager_GUI:
     def __init__(self, master):
         style = ttk.Style()
         font = Font(family="Helvetica", size=12)
@@ -633,26 +638,29 @@ class Database_Manager:
 
         self.master = master
         self.master.title('Database Manager')
-        self.master.geometry('500x200')
+        self.master.geometry('250x200')
         self.button_press = 0
         
         self.button_frame = ttk.Frame(self.master)
-        self.button_frame.pack(side="left", fill="y", expand=False)
-        self.department_button = ttk.Button(self.button_frame, text='Department', command=self.department_database)
-        self.student_button = ttk.Button(self.button_frame, text='Student Database', command=self.student_database)
-        self.teacher_button = ttk.Button(self.button_frame, text='Staff Database', command=self.teachers_database)
+        self.button_frame.pack(side="top", fill="both", expand=False)
+        self.department_button = ttk.Button(self.button_frame, text='Department', command=self.department_database, width=20)
+        self.student_button = ttk.Button(self.button_frame, text='Student Database', command=self.student_database, width=20)
+        self.teacher_button = ttk.Button(self.button_frame, text='Staff Database', command=self.teachers_database, width=20)
+        self.credit_button = ttk.Button(self.button_frame, text='Credits', command= lambda: CreditsWindow(self.master), width=20)
         self.department_button.pack(side="top", padx=10, pady=10)
         self.student_button.pack(side="top", padx=10, pady=(0,20))
         self.teacher_button.pack(side="top", padx=10, pady=10)
+        self.credit_button.pack(side="top", padx=10, pady=10)
         
         self.button_frame_extended = ttk.Frame(self.master)
-        self.button_frame_extended.pack(side="left", fill="y", expand=True)
-        self.button_personal_info = self.student_button = ttk.Button(self.button_frame_extended, text='Personal Data', command=self.personal_info)
-        self.button_mark_database = self.student_button = ttk.Button(self.button_frame_extended, text='Student Marks', command=self.mark_data)
+        self.button_personal_info = self.student_button = ttk.Button(self.button_frame_extended, text='Personal Data', command=self.personal_info, width=20)
+        self.button_mark_database = self.student_button = ttk.Button(self.button_frame_extended, text='Student Marks', command=self.mark_data, width=20)
     def department_database(self):
         self.master.withdraw()
         self.button_personal_info.pack_forget()
         self.button_mark_database.pack_forget()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
         self.button_press = 0
 
         new_window = DepartmentDatabaseGUI(self.master)
@@ -660,13 +668,18 @@ class Database_Manager:
         self.master.deiconify()
     def student_database(self):
         if self.button_press !=1:
-            self.button_personal_info.pack(side="top", padx=10, pady=(40,0))
+            self.button_frame.pack(side="left", fill="both", expand=False)
+            self.button_personal_info.pack(side="top", padx=10, pady=(50,0))
+            self.button_frame_extended.pack(side="left", fill="y", expand=True)
             self.button_mark_database.pack(side="top", padx=10, pady=10)
+            self.master.geometry('400x200')
             self.button_press = 1
     def personal_info(self):
         self.master.withdraw()
         self.button_personal_info.pack_forget()
         self.button_mark_database.pack_forget()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
         self.button_press = 0
         
         new_window = StudentDatabaseGUI(self.master)
@@ -676,6 +689,8 @@ class Database_Manager:
         self.master.withdraw()
         self.button_personal_info.pack_forget()
         self.button_mark_database.pack_forget()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
         self.button_press = 0
 
         new_window = StudentMarksGUI(self.master)
@@ -683,12 +698,16 @@ class Database_Manager:
         self.master.deiconify()
     def mark_database(self):
         self.master.withdraw()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
 
         new_window = StudentMarksGUI(self.master)
         new_window.main_window.wait_window()
         self.master.deiconify()
     def teachers_database(self):
         self.master.withdraw()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
         self.button_personal_info.pack_forget()
         self.button_mark_database.pack_forget()
         self.button_press = 0
@@ -696,6 +715,34 @@ class Database_Manager:
         new_window = TeacherDatabaseGUI(self.master)
         new_window.main_window.wait_window()
         self.master.deiconify()
+class CreditsWindow:
+    def __init__(self, master):
+        # self.master = master
+        self.master = tk.Toplevel(master)
+        self.master.title('Credits')
+        self.master.geometry('800x400')
+        self.canvas = tk.Canvas(self.master, width=800, height=400)
+        self.canvas.pack()
+        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI\n - Addition/Modification in database won't rewrite old backup.\n - Filter search optimised using threading (to be implemented)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation"
+        self.text_obj = None
+        self.after_id = None
+        self.y_pos = 500
+        self.roll_credits()
+
+    def roll_credits(self):
+        if not self.text_obj:
+            self.text_obj = self.canvas.create_text(400, 500, text=self.text, font=("Arial", 15), fill="black", width=800)
+
+        self.canvas.move(self.text_obj, 0, -2)
+        self.y_pos -= 2
+
+        if self.y_pos < -100:
+            self.y_pos = 500
+            self.canvas.delete(self.text_obj)
+            self.text_obj = None
+
+        self.after_id = self.master.after(30, self.roll_credits)
+
 class StudentMarks:
     def __init__(self, *args):
         # student_name, semester, department, marks
@@ -1052,7 +1099,7 @@ if __name__=='__main__':
 
     if exitcode == 0:
         root = tk.Tk()
-        my_gui = Database_Manager(root)
+        my_gui = Database_Manager_GUI(root)
         root.mainloop()
 
         # shutil.rmtree('./.cache')               # uncomment to delete cache after each use
