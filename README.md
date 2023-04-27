@@ -8,3 +8,6 @@ Features -
  - Addition/Modification in database won't rewrite old backup.
  - Filter search optimised using threading (to be implemented)
  - cache generated during runtime for ease of multithreading (to be implemented)
+
+
+A self-executable file is available in Releases.
