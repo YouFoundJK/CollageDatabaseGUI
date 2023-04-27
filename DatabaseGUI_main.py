@@ -12,7 +12,7 @@ Features -
 UPDATES - 
 
 v2.1
-	- Bug fix
+    - Bug fix
     - Asthetics
     - Credits 
 
