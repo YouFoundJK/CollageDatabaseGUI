@@ -10,7 +10,9 @@ Features -
  - cache generated during runtime for ease of multithreading (to be implemented)
 
 UPDATES - 
-
+v2.2
+	- Optimisation in filter and attribute_checker
+	
 v2.1
 	- Bug fix
     - Asthetics
@@ -18,6 +20,7 @@ v2.1
 
 v2.0
 	- Bug fix and optimisation
+    - Modify data requires login: Username and password - Admin
 
 '''
 
@@ -28,6 +31,118 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter.font import Font
 
+class Database_Manager_GUI:
+    def __init__(self, master):
+        style = ttk.Style()
+        font = Font(family="Helvetica", size=12)
+        style.configure("TButton", font=font)
+
+        self.master = master
+        self.master.title('Database Manager')
+        self.master.geometry('250x200')
+        self.button_press = 0
+        
+        self.button_frame = ttk.Frame(self.master)
+        self.button_frame.pack(side="top", fill="both", expand=False)
+        self.department_button = ttk.Button(self.button_frame, text='Department', command=self.department_database, width=20)
+        self.student_button = ttk.Button(self.button_frame, text='Student Database', command=self.student_database, width=20)
+        self.teacher_button = ttk.Button(self.button_frame, text='Staff Database', command=self.teachers_database, width=20)
+        self.credit_button = ttk.Button(self.button_frame, text='Credits', command= lambda: CreditsWindowGUI(self.master), width=20)
+        self.department_button.pack(side="top", padx=10, pady=10)
+        self.student_button.pack(side="top", padx=10, pady=(0,20))
+        self.teacher_button.pack(side="top", padx=10, pady=10)
+        self.credit_button.pack(side="top", padx=10, pady=10)
+        
+        self.button_frame_extended = ttk.Frame(self.master)
+        self.button_personal_info = self.student_button = ttk.Button(self.button_frame_extended, text='Personal Data', command=self.personal_info, width=20)
+        self.button_mark_database = self.student_button = ttk.Button(self.button_frame_extended, text='Student Marks', command=self.mark_data, width=20)
+    def department_database(self):
+        self.master.withdraw()
+        self.button_personal_info.pack_forget()
+        self.button_mark_database.pack_forget()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
+        self.button_press = 0
+
+        new_window = DepartmentDatabaseGUI(self.master)
+        new_window.main_window.wait_window()
+        self.master.deiconify()
+    def student_database(self):
+        if self.button_press !=1:
+            self.button_frame.pack(side="left", fill="both", expand=False)
+            self.button_personal_info.pack(side="top", padx=10, pady=(50,0))
+            self.button_frame_extended.pack(side="left", fill="y", expand=True)
+            self.button_mark_database.pack(side="top", padx=10, pady=10)
+            self.master.geometry('400x200')
+            self.button_press = 1
+    def personal_info(self):
+        self.master.withdraw()
+        self.button_personal_info.pack_forget()
+        self.button_mark_database.pack_forget()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
+        self.button_press = 0
+        
+        new_window = StudentDatabaseGUI(self.master)
+        new_window.main_window.wait_window()
+        self.master.deiconify()
+    def mark_data(self):
+        self.master.withdraw()
+        self.button_personal_info.pack_forget()
+        self.button_mark_database.pack_forget()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
+        self.button_press = 0
+
+        new_window = StudentMarksGUI(self.master)
+        new_window.main_window.wait_window()
+        self.master.deiconify()
+    def mark_database(self):
+        self.master.withdraw()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
+
+        new_window = StudentMarksGUI(self.master)
+        new_window.main_window.wait_window()
+        self.master.deiconify()
+    def teachers_database(self):
+        self.master.withdraw()
+        self.master.geometry('250x200')
+        self.button_frame.pack(side="top", fill="both", expand=False)
+        self.button_personal_info.pack_forget()
+        self.button_mark_database.pack_forget()
+        self.button_press = 0
+
+        new_window = TeacherDatabaseGUI(self.master)
+        new_window.main_window.wait_window()
+        self.master.deiconify()
+class CreditsWindowGUI:
+    def __init__(self, master):
+        # self.master = master
+        self.master = tk.Toplevel(master)
+        self.master.title('Credits')
+        self.master.geometry('800x400')
+        self.canvas = tk.Canvas(self.master, width=800, height=400)
+        self.canvas.pack()
+        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI\n - Addition/Modification in database won't rewrite old backup.\n - Filter search optimised using threading (to be implemented)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation"
+        self.text_obj = None
+        self.after_id = None
+        self.y_pos = 500
+        self.roll_credits()
+
+    def roll_credits(self):
+        if not self.text_obj:
+            self.text_obj = self.canvas.create_text(400, 500, text=self.text, font=("Arial", 15), fill="black", width=800)
+
+        self.canvas.move(self.text_obj, 0, -2)
+        self.y_pos -= 2
+
+        if self.y_pos < -100:
+            self.y_pos = 500
+            self.canvas.delete(self.text_obj)
+            self.text_obj = None
+
+        self.after_id = self.master.after(30, self.roll_credits)
 
 class StudentDatabaseGUI:
 	def __init__(self, master, inheritance_parameter = 'Student'):
@@ -40,8 +155,8 @@ class StudentDatabaseGUI:
 			self.export_file_name = f'all_{self.category}_data'
 			self.current_backup_status = 1                              # backup not required
 			self.button_pressed = tk.IntVar()
-			self.filter = student_filter 
-			self.attrib_checker = student_attribute_checker
+			self.filter = member_filter 
+			self.attrib_checker = member_attribute_checker
 			self.filter_name = {1:'Name', 2:'Roll No', 3:'Year of birth', 4:'Year of Admission', 5:'Is Alumni'}
 			self.inheritance_manager = inheritance_parameter		# 'Student', 'Teacher', 'StudentMarks'
 
@@ -307,7 +422,7 @@ class StudentDatabaseGUI:
 								else:
 									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.year_button, self.alumni_button]
 								new_value = self.user_input
-								error_message, new_value = self.attrib_checker(filter_no, new_value)
+								error_message, new_value = self.attrib_checker(self.inheritance_manager,filter_no, new_value)
 
 								if error_message:
 									self.text_widget.insert(tk.END, str(error_message)+'\n')
@@ -353,7 +468,7 @@ class StudentDatabaseGUI:
 							elif self.button_pressed.get() == 100 and self.user_input.lower() == 'y':
 								index = [index for index, member in enumerate(self.members) if member.name == self.displayed_member_list[0].name][0]
 								attribute_name = {1:'name', 2:'roll_no', 3:'dob', 4:'year_of_admission', 5:'alumni'}
-								error_message, new_value = self.attrib_checker(filter_no, new_value)
+								error_message, new_value = self.attrib_checker(self.inheritance_manager, filter_no, new_value)
 
 								if not error_message:
 										setattr(self.members[index], attribute_name.get(filter_no), new_value)
@@ -372,7 +487,6 @@ class StudentDatabaseGUI:
 								break
 					else:
 						break
-
 	def modify_data(self):
 			# self.new_interface('admin')
 			self.button_pressed.set(0)
@@ -385,8 +499,7 @@ class StudentDatabaseGUI:
 				self.main_window.wait_variable(self.button_pressed)			# Username input
 				if self.button_pressed.get() == 100 and self.user_input:
 					user = self.user_input
-					self.text_widget.insert(tk.END, user +'\n')
-					self.text_widget.insert(tk.END, "Enter Password: ")
+					self.text_widget.insert(tk.END, user +"\nEnter Password: ")
 					self.text_widget.see(tk.END)
 					self.main_window.wait_variable(self.button_pressed)		# Password input
 
@@ -415,8 +528,6 @@ class TeacherDatabaseGUI(StudentDatabaseGUI):       # Inherited from StudentData
 		
 		self.category = 'teacher'
 		self.main_window.title("Staff Database")
-		self.filter = teacher_filter 	
-		self.attrib_checker = teacher_attribute_checker
 		self.filter_name = {1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'Is HOD'}
 
 		self.name_button = ttk.Button(self.button_frame, text="Name", command=lambda:self.button_pressed.set(1))
@@ -432,14 +543,12 @@ class TeacherDatabaseGUI(StudentDatabaseGUI):       # Inherited from StudentData
 		if self.current_backup_status == 0:
 			index = len([filename for filename in os.listdir('./backup') if filename.startswith(f'{self.category}_data')])
 			write_file(self.members, f'./backup/{self.category}_data_{index}.csv')
-class StudentMarksGUI(StudentDatabaseGUI):       # Inherited from StudentDatabaseGUI
+class StudentMarksGUI(StudentDatabaseGUI):       	# Inherited from StudentDatabaseGUI
 	def __init__(self, master):
 		super().__init__(master, 'StudentMarks')
 		
 		self.category = 'student_marks'
 		self.main_window.title("Mark Database")
-		self.filter = student_mark_filter 	
-		self.attrib_checker = student_mark_attribute_checker
 		self.filter_name = {1:'Name', 2:'Semester', 3:'Department', 4:'CGPA'}
 		
 		self.name_button = ttk.Button(self.button_frame, text="Name", command=lambda:self.button_pressed.set(1))
@@ -519,7 +628,7 @@ class DepartmentDatabaseGUI:
 		self.text_widget.delete('1.0', 'end')
 		departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
 		self.button_pressed.set(0)
-		self.text_widget.insert(tk.END, f'Input a department to view details:')
+		self.text_widget.insert(tk.END, f'Lists out all the students and teachers in the department under separate heading.\nInput a department to view the list: ')
 		while self.button_pressed.get() != 110:
 			self.main_window.wait_variable(self.button_pressed)
 			list_department = ''
@@ -630,122 +739,10 @@ class DepartmentDatabaseGUI:
 		self.button_pressed.set(110)
 		self.main_window.destroy()
 
-class Database_Manager_GUI:
-    def __init__(self, master):
-        style = ttk.Style()
-        font = Font(family="Helvetica", size=12)
-        style.configure("TButton", font=font)
-
-        self.master = master
-        self.master.title('Database Manager')
-        self.master.geometry('250x200')
-        self.button_press = 0
-        
-        self.button_frame = ttk.Frame(self.master)
-        self.button_frame.pack(side="top", fill="both", expand=False)
-        self.department_button = ttk.Button(self.button_frame, text='Department', command=self.department_database, width=20)
-        self.student_button = ttk.Button(self.button_frame, text='Student Database', command=self.student_database, width=20)
-        self.teacher_button = ttk.Button(self.button_frame, text='Staff Database', command=self.teachers_database, width=20)
-        self.credit_button = ttk.Button(self.button_frame, text='Credits', command= lambda: CreditsWindow(self.master), width=20)
-        self.department_button.pack(side="top", padx=10, pady=10)
-        self.student_button.pack(side="top", padx=10, pady=(0,20))
-        self.teacher_button.pack(side="top", padx=10, pady=10)
-        self.credit_button.pack(side="top", padx=10, pady=10)
-        
-        self.button_frame_extended = ttk.Frame(self.master)
-        self.button_personal_info = self.student_button = ttk.Button(self.button_frame_extended, text='Personal Data', command=self.personal_info, width=20)
-        self.button_mark_database = self.student_button = ttk.Button(self.button_frame_extended, text='Student Marks', command=self.mark_data, width=20)
-    def department_database(self):
-        self.master.withdraw()
-        self.button_personal_info.pack_forget()
-        self.button_mark_database.pack_forget()
-        self.master.geometry('250x200')
-        self.button_frame.pack(side="top", fill="both", expand=False)
-        self.button_press = 0
-
-        new_window = DepartmentDatabaseGUI(self.master)
-        new_window.main_window.wait_window()
-        self.master.deiconify()
-    def student_database(self):
-        if self.button_press !=1:
-            self.button_frame.pack(side="left", fill="both", expand=False)
-            self.button_personal_info.pack(side="top", padx=10, pady=(50,0))
-            self.button_frame_extended.pack(side="left", fill="y", expand=True)
-            self.button_mark_database.pack(side="top", padx=10, pady=10)
-            self.master.geometry('400x200')
-            self.button_press = 1
-    def personal_info(self):
-        self.master.withdraw()
-        self.button_personal_info.pack_forget()
-        self.button_mark_database.pack_forget()
-        self.master.geometry('250x200')
-        self.button_frame.pack(side="top", fill="both", expand=False)
-        self.button_press = 0
-        
-        new_window = StudentDatabaseGUI(self.master)
-        new_window.main_window.wait_window()
-        self.master.deiconify()
-    def mark_data(self):
-        self.master.withdraw()
-        self.button_personal_info.pack_forget()
-        self.button_mark_database.pack_forget()
-        self.master.geometry('250x200')
-        self.button_frame.pack(side="top", fill="both", expand=False)
-        self.button_press = 0
-
-        new_window = StudentMarksGUI(self.master)
-        new_window.main_window.wait_window()
-        self.master.deiconify()
-    def mark_database(self):
-        self.master.withdraw()
-        self.master.geometry('250x200')
-        self.button_frame.pack(side="top", fill="both", expand=False)
-
-        new_window = StudentMarksGUI(self.master)
-        new_window.main_window.wait_window()
-        self.master.deiconify()
-    def teachers_database(self):
-        self.master.withdraw()
-        self.master.geometry('250x200')
-        self.button_frame.pack(side="top", fill="both", expand=False)
-        self.button_personal_info.pack_forget()
-        self.button_mark_database.pack_forget()
-        self.button_press = 0
-
-        new_window = TeacherDatabaseGUI(self.master)
-        new_window.main_window.wait_window()
-        self.master.deiconify()
-class CreditsWindow:
-    def __init__(self, master):
-        # self.master = master
-        self.master = tk.Toplevel(master)
-        self.master.title('Credits')
-        self.master.geometry('800x400')
-        self.canvas = tk.Canvas(self.master, width=800, height=400)
-        self.canvas.pack()
-        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI\n - Addition/Modification in database won't rewrite old backup.\n - Filter search optimised using threading (to be implemented)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation"
-        self.text_obj = None
-        self.after_id = None
-        self.y_pos = 500
-        self.roll_credits()
-
-    def roll_credits(self):
-        if not self.text_obj:
-            self.text_obj = self.canvas.create_text(400, 500, text=self.text, font=("Arial", 15), fill="black", width=800)
-
-        self.canvas.move(self.text_obj, 0, -2)
-        self.y_pos -= 2
-
-        if self.y_pos < -100:
-            self.y_pos = 500
-            self.canvas.delete(self.text_obj)
-            self.text_obj = None
-
-        self.after_id = self.master.after(30, self.roll_credits)
-
 class StudentMarks:
     def __init__(self, *args):
         # student_name, semester, department, marks
+        self.category = 'student_marks'
         self.name = args[0]
         self.semester = int(args[1])
         self.department = args[2]
@@ -757,7 +754,8 @@ class StudentMarks:
         return f"{self.name},{self.semester},{self.department},{self.cgpa}"
 class Student:
     def __init__(self, *args): 
-        # Name,Roll Number,Date of Birth,Year of Admission,Alumni
+	# Name,Roll Number,Date of Birth,Year of Admission,Alumni
+        self.category = 'student'
         self.name = args[0]
         self.roll_no = int(args[1])
         self.dob = args[2]
@@ -772,6 +770,7 @@ class Student:
 class Teacher:
     def __init__(self, *args): 
         #name, gender, department, hod, year_of_joining
+        self.category = 'teacher'
         self.name = args[0]
         self.gender = int(args[1])
         self.department = args[2]
@@ -782,241 +781,238 @@ class Teacher:
     def export_data(self):
         return f"{self.name},{self.gender},{self.department},{self.hod},{self.year_of_joining}"
 
-def student_filter(students, attrib_no, attrib_value_inp):
-    # Input Students - list of class Student
-    error_message = ''
-    export_file_name = ''
-    filtered_students = students
-    attrib_name = {1:'name', 2:'Roll No', 3:'Year of birth', 4:'Year of Admission', 5:'Is Alumni'}.get(attrib_no)
+def member_filter(members, attrib_no, attrib_value_inp):
+    if members[0].category == 'student':
+	# Input members - list of class Student
+        error_message = ''
+        export_file_name = ''
+        filtered_members = members
+        attrib_name = {1:'name', 2:'Roll No', 3:'Year of birth', 4:'Year of Admission', 5:'Is Alumni'}.get(attrib_no)
 
-    if attrib_no in [2, 3, 4]:
-        try:
-            attrib_symbol = attrib_value_inp[0]; attrib_value = int(attrib_value_inp[1:])
-        except:
-            filtered_students = students
-            error_message = 'Check Input - attrib_value_inp Error\nEg: =200'
-        else: 
-
-            if attrib_symbol == '>':
-                filtered_students = [student for student in students if (attrib_no == 2 and student.roll_no > attrib_value) or (attrib_no == 3 and student.year_dob > attrib_value) or (attrib_no == 4 and student.year_of_admission > attrib_value)]
-            elif attrib_symbol == '<':
-                filtered_students = [student for student in students if (attrib_no == 2 and student.roll_no < attrib_value) or (attrib_no == 3 and student.year_dob < attrib_value) or (attrib_no == 4 and student.year_of_admission < attrib_value)]
-            elif attrib_symbol == '=':
-                filtered_students = [student for student in students if (attrib_no == 2 and student.roll_no == attrib_value) or (attrib_no == 3 and student.year_dob == attrib_value) or (attrib_no == 4 and student.year_of_admission == attrib_value)]
+        if attrib_no in [2, 3, 4]:
+            try:
+                attrib_symbol = attrib_value_inp[0]; attrib_value = int(attrib_value_inp[1:])
+            except:
+                filtered_members = members
+                error_message = 'Check Input - attrib_value_inp Error\nEg: =200'
             else: 
-                filtered_students = students
-                error_message = 'Check Input: attrib_symbol Error\nEg: =200'
 
-    elif attrib_no == 1:
-        attrib_value = attrib_value_inp
+                if attrib_symbol == '>':
+                    filtered_members = [student for student in members if (attrib_no == 2 and student.roll_no > attrib_value) or (attrib_no == 3 and student.year_dob > attrib_value) or (attrib_no == 4 and student.year_of_admission > attrib_value)]
+                elif attrib_symbol == '<':
+                    filtered_members = [student for student in members if (attrib_no == 2 and student.roll_no < attrib_value) or (attrib_no == 3 and student.year_dob < attrib_value) or (attrib_no == 4 and student.year_of_admission < attrib_value)]
+                elif attrib_symbol == '=':
+                    filtered_members = [student for student in members if (attrib_no == 2 and student.roll_no == attrib_value) or (attrib_no == 3 and student.year_dob == attrib_value) or (attrib_no == 4 and student.year_of_admission == attrib_value)]
+                else: 
+                    filtered_members = members
+                    error_message = 'Check Input: attrib_symbol Error\nEg: =200'
 
-        if attrib_value:
-            filtered_students = [student for student in students if attrib_value.lower() in student.name.lower()]
-        else:
-            error_message = 'Check Input: Give a name keyword to filter'
-        
-    elif attrib_no == 5:
-        attrib_value = attrib_value_inp
-        if attrib_value.lower() == 'y':
-            attrib_value = 1
-            filtered_students = [student for student in students if attrib_value == student.alumni]
-        elif attrib_value.lower() == 'n':
-            attrib_value = 0
-            filtered_students = [student for student in students if attrib_value == student.alumni]
-        else:
-            error_message = 'Check Input: attrib_value_inp Error\nEg: "y" or "n"'
+        elif attrib_no == 1:
+            attrib_value = attrib_value_inp
 
-    if not error_message:
-        export_file_name = f'{attrib_name}-{attrib_value}_'
-
-    return filtered_students, export_file_name, error_message
-def student_attribute_checker(filter_no, new_value):
-    import re
-    error_message = None
-    if filter_no in [2,4,5]:
-        try:
-            new_value = int(new_value)   
-        except:
-            error_message = "InputError: Enter Integer Input."
-        else:    
-            if filter_no == 2:
-                if not isinstance(new_value, int) or len(str(new_value)) != 3:
-                    error_message = "InputError: The input value is not a 3 digit integer."
-            elif filter_no == 4:
-                if not isinstance(new_value, int) or len(str(new_value)) != 4:
-                    error_message = "InputError: The input value is not a 4 digit integer."
-            elif filter_no == 5:
-                if new_value not in [0, 1]:
-                    error_message = "InputError: The input value is not either 0 or 1."
-    elif filter_no == 3:
-        if not re.match(r"^\d{2}-\d{2}-\d{4}$", new_value):
-            error_message = "InputError: The input value is not in the format ii-ii-iiii where i is an integer."
-    else:
-        error_message = None
-    return error_message, new_value
-
-def teacher_filter(teachers, attrib_no, attrib_value_inp):
-    # Input teachers - list of class teacher
-    error_message = ''
-    export_file_name = ''
-    filtered_teachers = teachers
-    attrib_name = {1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'HOD'}.get(attrib_no)
-    # DONE - 2, 5, 4
-    if attrib_no == 4:
-        try:
-            attrib_symbol = attrib_value_inp[0]; attrib_value = int(attrib_value_inp[1:])
-        except:
-            filtered_teachers = teachers
-            error_message = 'Check Input - attrib_value_inp Error\nEg: =2007'
-        else: 
-
-            if attrib_symbol == '>':
-                filtered_teachers = [teacher for teacher in teachers if teacher.year_of_joining > attrib_value]
-            elif attrib_symbol == '<':
-                filtered_teachers = [teacher for teacher in teachers if teacher.year_of_joining < attrib_value]
-            elif attrib_symbol == '=':
-                filtered_teachers = [teacher for teacher in teachers if teacher.year_of_joining == attrib_value]
-            else: 
-                filtered_teachers = teachers
-                error_message = 'Check Input: attrib_symbol Error\nEg: =2006'
-
-    elif attrib_no in [1, 3]:
-        attrib_value = attrib_value_inp
-
-        if attrib_value:
-            filtered_teachers = [teacher for teacher in teachers if (attrib_value.lower() in teacher.name.lower() or attrib_value.lower() in teacher.department.lower())]
-        else:
-            error_message = 'Check Input: Give a name keyword to filter'
-            if attrib_no == 3:
-                error_message+="\nValid departments are: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
-        
-    elif attrib_no in [2,5]:
-        attrib_value = attrib_value_inp
-
-        if attrib_value.lower() == 'y' or attrib_value.lower() == 'm':
-            attrib_value = 1
-            filtered_teachers = [teacher for teacher in teachers if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
-        elif attrib_value.lower() == 'n' or attrib_value.lower() == 'f':
-            attrib_value = 0
-            filtered_teachers = [teacher for teacher in teachers if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
-        else:
-            if attrib_no == 2:
-                error_message = 'Check Input: attrib_value_inp Error\nEg: "m" or "f"'
+            if attrib_value:
+                filtered_members = [student for student in members if attrib_value.lower() in student.name.lower()]
+            else:
+                error_message = 'Check Input: Give a name keyword to filter'
+            
+        elif attrib_no == 5:
+            attrib_value = attrib_value_inp
+            if attrib_value.lower() == 'y':
+                attrib_value = 1
+                filtered_members = [student for student in members if attrib_value == student.alumni]
+            elif attrib_value.lower() == 'n':
+                attrib_value = 0
+                filtered_members = [student for student in members if attrib_value == student.alumni]
             else:
                 error_message = 'Check Input: attrib_value_inp Error\nEg: "y" or "n"'
 
-    if not error_message:
-        export_file_name = f'{attrib_name}-{attrib_value}_'
+        if not error_message:
+            export_file_name = f'{attrib_name}-{attrib_value}_'
 
-    return filtered_teachers, export_file_name, error_message
-def teacher_attribute_checker(filter_no, new_value):
-    # 1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'HOD'
-    department = new_value
-    error_message = None
-    if filter_no in [2,4,5]:
-        try:
-            new_value = int(new_value)
-        except:
-            if filter_no == 2:
-                error_message = "InputError: Input 1 for Male or 0 for Female"
-            else:
-                error_message = "InputError: Input Integer values"
-        else:
-            if filter_no == 4:
-                if not isinstance(new_value, int) or len(str(new_value)) != 4:
-                    error_message = "InputError: The input value is not a 4 digit integer."
-            elif filter_no in [2, 5]:
-                if new_value not in [0, 1]:
-                    error_message = "InputError: The input value is not either 0 or 1."
-
-    elif filter_no == 3:
-        departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
-        matches = [department for department in departments if new_value.lower() in department.lower()]
-        if len(matches) != 1:
-            error_message = "InputError: Department not uniquely identifiable\nInput any in: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
-        else:
-            department = matches[0]
-            error_message = None
-    else:
-        error_message = None
-
-    return error_message, department
-
-def student_mark_filter(student_marks, attrib_no, attrib_value_inp):
-    # Input student_marks - list of class student_mark
-    error_message = ''
-    export_file_name = ''
-    filtered_student_marks = student_marks
-    attrib_name = {1:'Name', 2:'Semester', 3:'Department', 4:'CGPA'}.get(attrib_no)
-    if attrib_no in [2, 4]:
-        try:
-            attrib_symbol = attrib_value_inp[0]
-            if attrib_no == 2:
-                attrib_value = int(attrib_value_inp[1:])
-            else:
-                attrib_value = int(float(attrib_value_inp[1:])*10)
-        except:
-            filtered_student_marks = student_marks
-            if attrib_no == 2:
-                error_message = 'Check Input - attrib_value_inp Error\nEg: >7'
-            else:
-                error_message = 'Check Input - attrib_value_inp Error\nEg: <5.6'
-        else: 
-            if attrib_symbol == '>':
-                filtered_student_marks = [student_mark for student_mark in student_marks if (int(float(student_mark.cgpa)*10) > attrib_value or student_mark.semester > attrib_value)]
-            elif attrib_symbol == '<':
-                filtered_student_marks = [student_mark for student_mark in student_marks if (int(float(student_mark.cgpa)*10) < attrib_value or student_mark.semester < attrib_value)]
-            elif attrib_symbol == '=':
-                filtered_student_marks = [student_mark for student_mark in student_marks if (int(float(student_mark.cgpa)*10) == attrib_value or student_mark.semester == attrib_value)]
+        return filtered_members, export_file_name, error_message
+    elif members[0].category == 'teacher':
+        # Input members - list of class teacher
+        error_message = ''
+        export_file_name = ''
+        filtered_teachers = members
+        attrib_name = {1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'HOD'}.get(attrib_no)
+        # DONE - 2, 5, 4
+        if attrib_no == 4:
+            try:
+                attrib_symbol = attrib_value_inp[0]; attrib_value = int(attrib_value_inp[1:])
+            except:
+                filtered_teachers = members
+                error_message = 'Check Input - attrib_value_inp Error\nEg: =2007'
             else: 
-                filtered_student_marks = student_marks
-                error_message = 'Check Input: attrib_symbol Error\nEg: =2006'
 
-    elif attrib_no in [1, 3]:
-        attrib_value = attrib_value_inp
+                if attrib_symbol == '>':
+                    filtered_teachers = [teacher for teacher in members if teacher.year_of_joining > attrib_value]
+                elif attrib_symbol == '<':
+                    filtered_teachers = [teacher for teacher in members if teacher.year_of_joining < attrib_value]
+                elif attrib_symbol == '=':
+                    filtered_teachers = [teacher for teacher in members if teacher.year_of_joining == attrib_value]
+                else: 
+                    filtered_teachers = members
+                    error_message = 'Check Input: attrib_symbol Error\nEg: =2006'
 
-        if attrib_value:
-            filtered_student_marks = [student_mark for student_mark in student_marks if (attrib_value.lower() in student_mark.name.lower() or attrib_value.lower() in student_mark.department.lower())]
-        else:
-            error_message = 'Check Input: Give a name keyword to filter'
-            if attrib_no == 3:
-                error_message+="\nValid departments are: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
-        
-    if not error_message:
-        export_file_name = f'{attrib_name}-{attrib_value}_'
+        elif attrib_no in [1, 3]:
+            attrib_value = attrib_value_inp
 
-    return filtered_student_marks, export_file_name, error_message
-def student_mark_attribute_checker(filter_no, new_value):
-    # 1:'Name', 2:'Semester', 3:'Department', 4:'CGPA'
-    department = new_value
-    error_message = None
-    if filter_no in [2,4]:
-        try:
-            if filter_no == 2:
-                new_value = int(new_value)
+            if attrib_value:
+                filtered_teachers = [teacher for teacher in members if (attrib_value.lower() in teacher.name.lower() or attrib_value.lower() in teacher.department.lower())]
             else:
-                new_value = float(new_value)
+                error_message = 'Check Input: Give a name keyword to filter'
+                if attrib_no == 3:
+                    error_message+="\nValid departments are: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
             
-        except:
-            if filter_no == 2:
-                error_message = "InputError: Input Interger value between 1-10"
-            else:
-                error_message = "InputError: Input float value between 1-10"
-        else:
-            if new_value > 10 or new_value < 0:
-                error_message = "InputError: The input value between 1 and 10."
+        elif attrib_no in [2,5]:
+            attrib_value = attrib_value_inp
 
-    elif filter_no == 3:
-        departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
-        matches = [department for department in departments if new_value.lower() in department.lower()]
-        if len(matches) != 1:
-            error_message = "InputError: Department not uniquely identifiable\nInput any in: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
-        else:
-            department = matches[0]
-            error_message = None
-    else:
-        error_message = None
-    return error_message, department
+            if attrib_value.lower() == 'y' or attrib_value.lower() == 'm':
+                attrib_value = 1
+                filtered_teachers = [teacher for teacher in members if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
+            elif attrib_value.lower() == 'n' or attrib_value.lower() == 'f':
+                attrib_value = 0
+                filtered_teachers = [teacher for teacher in members if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
+            else:
+                if attrib_no == 2:
+                    error_message = 'Check Input: attrib_value_inp Error\nEg: "m" or "f"'
+                else:
+                    error_message = 'Check Input: attrib_value_inp Error\nEg: "y" or "n"'
+
+        if not error_message:
+            export_file_name = f'{attrib_name}-{attrib_value}_'
+
+        return filtered_teachers, export_file_name, error_message
+    elif members[0].category == 'student_marks':
+        # Input members - list of class student_mark
+        error_message = ''
+        export_file_name = ''
+        filtered_members = members
+        attrib_name = {1:'Name', 2:'Semester', 3:'Department', 4:'CGPA'}.get(attrib_no)
+        if attrib_no in [2, 4]:
+            try:
+                attrib_symbol = attrib_value_inp[0]
+                if attrib_no == 2:
+                    attrib_value = int(attrib_value_inp[1:])
+                else:
+                    attrib_value = int(float(attrib_value_inp[1:])*10)
+            except:
+                filtered_members = members
+                if attrib_no == 2:
+                    error_message = 'Check Input - attrib_value_inp Error\nEg: >7'
+                else:
+                    error_message = 'Check Input - attrib_value_inp Error\nEg: <5.6'
+            else: 
+                if attrib_symbol == '>':
+                    filtered_members = [student_mark for student_mark in members if (int(float(student_mark.cgpa)*10) > attrib_value or student_mark.semester > attrib_value)]
+                elif attrib_symbol == '<':
+                    filtered_members = [student_mark for student_mark in members if (int(float(student_mark.cgpa)*10) < attrib_value or student_mark.semester < attrib_value)]
+                elif attrib_symbol == '=':
+                    filtered_members = [student_mark for student_mark in members if (int(float(student_mark.cgpa)*10) == attrib_value or student_mark.semester == attrib_value)]
+                else: 
+                    filtered_members = members
+                    error_message = 'Check Input: attrib_symbol Error\nEg: =2006'
+
+        elif attrib_no in [1, 3]:
+            attrib_value = attrib_value_inp
+
+            if attrib_value:
+                filtered_members = [student_mark for student_mark in members if (attrib_value.lower() in student_mark.name.lower() or attrib_value.lower() in student_mark.department.lower())]
+            else:
+                error_message = 'Check Input: Give a name keyword to filter'
+                if attrib_no == 3:
+                    error_message+="\nValid departments are: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
+            
+        if not error_message:
+            export_file_name = f'{attrib_name}-{attrib_value}_'
+
+        return filtered_members, export_file_name, error_message
+def member_attribute_checker(category, filter_no, new_value):
+	import re
+	department = new_value
+	error_message = None
+	if category == 'Student':
+		if filter_no in [2,4,5]:
+			try:
+				new_value = int(new_value)   
+			except:
+				error_message = "InputError: Enter Integer Input."
+			else:    
+				if filter_no == 2:
+					if not isinstance(new_value, int) or len(str(new_value)) != 3:
+						error_message = "InputError: The input value is not a 3 digit integer."
+				elif filter_no == 4:
+					if not isinstance(new_value, int) or len(str(new_value)) != 4:
+						error_message = "InputError: The input value is not a 4 digit integer."
+				elif filter_no == 5:
+					if new_value not in [0, 1]:
+						error_message = "InputError: The input value is not either 0 or 1."
+		elif filter_no == 3:
+			if not re.match(r"^\d{2}-\d{2}-\d{4}$", new_value):
+				error_message = "InputError: The input value is not in the format dd-mm-yyyy where i is an integer."
+		else:
+			error_message = None
+		return error_message, new_value
+	elif category == 'Teacher':
+    # 1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'HOD'
+		if filter_no in [2,4,5]:
+			try:
+				new_value = int(new_value)
+			except:
+				if filter_no == 2:
+					error_message = "InputError: Input 1 for Male or 0 for Female"
+				else:
+					error_message = "InputError: Input Integer values"
+			else:
+				if filter_no == 4:
+					if not isinstance(new_value, int) or len(str(new_value)) != 4:
+						error_message = "InputError: The input value is not a 4 digit integer."
+				elif filter_no in [2, 5]:
+					if new_value not in [0, 1]:
+						error_message = "InputError: The input value is not either 0 or 1."
+
+		elif filter_no == 3:
+			departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
+			matches = [department for department in departments if new_value.lower() in department.lower()]
+			if len(matches) != 1:
+				error_message = "InputError: Department not uniquely identifiable\nInput any in: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
+			else:
+				department = matches[0]
+				error_message = None
+		else:
+			error_message = None
+
+		return error_message, department
+	elif category == 'StudentMarks':
+		# 1:'Name', 2:'Semester', 3:'Department', 4:'CGPA'
+		if filter_no in [2,4]:
+			try:
+				if filter_no == 2:
+					new_value = int(new_value)
+				else:
+					new_value = float(new_value)
+				
+			except:
+				if filter_no == 2:
+					error_message = "InputError: Input Interger value between 1-10"
+				else:
+					error_message = "InputError: Input float value between 1-10"
+			else:
+				if new_value > 10 or new_value < 0:
+					error_message = "InputError: The input value between 1 and 10."
+
+		elif filter_no == 3:
+			departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
+			matches = [department for department in departments if new_value.lower() in department.lower()]
+			if len(matches) != 1:
+				error_message = "InputError: Department not uniquely identifiable\nInput any in: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
+			else:
+				department = matches[0]
+				error_message = None
+		else:
+			error_message = None
+		return error_message, department        
 
 def read_file(filename):
     Member = None
@@ -1051,7 +1047,7 @@ def write_file(data, filename):
 		file.write(header)
 		for member in data:
 			file.write(f'{member.export_data()}\n')
-            
+
 def hash_string(string):
     hash = 0
     for char in string:
