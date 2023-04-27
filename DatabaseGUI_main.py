@@ -9,6 +9,11 @@ Features -
  - Filter search optimised using threading (not implemented yet)
  - cache generated during runtime for ease of multithreading (not implemented yet)
 
+UPDATES - 
+
+v2.0
+	- Bug fix
+	
 '''
 
 import os
@@ -163,7 +168,9 @@ class StudentDatabaseGUI:
 
 			if self.button_pressed.get() == 1:
 					parameter = 'add'
-					self.displayed_member_list = []
+					self.displayed_member_list = [-1,-1,-1,-1,-1]
+					if self.inheritance_manager == 'StudentMarks':											
+						del self.displayed_member_list[-1]
 			elif self.button_pressed.get() == 2:
 					parameter = 'narrow down'
 					self.displayed_member_list = self.members
@@ -184,7 +191,7 @@ class StudentDatabaseGUI:
 			self.text_widget.see(tk.END)
 			self.main_window.wait_variable(self.button_pressed)			# intented for filter_no
 
-		# Nested Filter Implementation
+		# Nested Filter Implementation - handles Adding/Modifying and Filtering Data
 		bypass = 0
 		
 		while True:
@@ -301,14 +308,27 @@ class StudentDatabaseGUI:
 									self.text_widget.insert(tk.END, str(error_message)+'\n')
 								else:
 									button_unpack[filter_no-1].pack_forget()
-									self.displayed_member_list.append(new_value)
+									self.displayed_member_list[filter_no-1] = (new_value)
 									self.text_widget.insert(tk.END, f'Input successful.\nSelect next attribute\n\n')
 								
-								if len(self.displayed_member_list) == 5:
+								if (not -1 in self.displayed_member_list and self.inheritance_manager == 'Student'):
 									self.members.append(Student(*self.displayed_member_list))
 									self.current_backup_status = 0
 									self.back()
 									self.text_widget.insert(tk.END, f'New student successfully added.\n\n')
+									self.text_widget.see(tk.END)
+								elif (not -1 in self.displayed_member_list and self.inheritance_manager == 'StudentMarks'):
+									self.members.append(StudentMarks(*self.displayed_member_list))
+									self.current_backup_status = 0
+									self.back()
+									self.text_widget.insert(tk.END, f'New Student Marks successfully added.\n\n')
+									self.text_widget.see(tk.END)
+								elif (not -1 in self.displayed_member_list and self.inheritance_manager == 'Teacher'):
+									self.members.append(Teacher(*self.displayed_member_list))
+									self.current_backup_status = 0
+									self.back()
+									self.text_widget.insert(tk.END, f'New Staff successfully added.\n\n')
+									self.text_widget.see(tk.END)
 								break
 			
 							else:
@@ -389,7 +409,7 @@ class TeacherDatabaseGUI(StudentDatabaseGUI):       # Inherited from StudentData
 		super().__init__(master, 'Teacher')
 		
 		self.category = 'teacher'
-		self.main_window.title("Teacher Database")
+		self.main_window.title("Staff Database")
 		self.filter = teacher_filter 	
 		self.attrib_checker = teacher_attribute_checker
 		self.filter_name = {1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'Is HOD'}
@@ -534,6 +554,7 @@ class DepartmentDatabaseGUI:
 							self.text_widget.insert(tk.END, f'Teachers in {filtered_departments[0]}:\n')
 							self.text_widget.insert(tk.END, '\n'.join(str(member) for member in teacher_list).join(f'\n\n'))
 							self.text_widget.insert(tk.END, '\n')
+							self.text_widget.insert(tk.END, f'Enter new department to filter or export the results.\nFor nested filtering options go to other database.\n')
 							self.text_widget.see(tk.END)
 							
 							self.displayed_member_list = student_list
@@ -603,6 +624,7 @@ class DepartmentDatabaseGUI:
 	def close_window(self):         # Safely exit the loop in new_interface
 		self.button_pressed.set(110)
 		self.main_window.destroy()
+
 class Database_Manager:
     def __init__(self, master):
         style = ttk.Style()
@@ -618,7 +640,7 @@ class Database_Manager:
         self.button_frame.pack(side="left", fill="y", expand=False)
         self.department_button = ttk.Button(self.button_frame, text='Department', command=self.department_database)
         self.student_button = ttk.Button(self.button_frame, text='Student Database', command=self.student_database)
-        self.teacher_button = ttk.Button(self.button_frame, text='Teachers Database', command=self.teachers_database)
+        self.teacher_button = ttk.Button(self.button_frame, text='Staff Database', command=self.teachers_database)
         self.department_button.pack(side="top", padx=10, pady=10)
         self.student_button.pack(side="top", padx=10, pady=(0,20))
         self.teacher_button.pack(side="top", padx=10, pady=10)
@@ -682,7 +704,7 @@ class StudentMarks:
         self.department = args[2]
         self.cgpa = args[3]
     def __str__(self):
-        return f"Name: {self.name} Semester: {self.semester} department: {self.department} cgpa: {self.cgpa}"
+        return f"Name: {self.name} Semester: {self.semester} Department: {self.department} CGPA: {self.cgpa}"
     def export_data(self):
         #Name,Roll Number,Date of Birth,Year of Admission,Alumni
         return f"{self.name},{self.semester},{self.department},{self.cgpa}"
@@ -763,6 +785,7 @@ def student_filter(students, attrib_no, attrib_value_inp):
     return filtered_students, export_file_name, error_message
 def student_attribute_checker(filter_no, new_value):
     import re
+    error_message = None
     if filter_no in [2,4,5]:
         try:
             new_value = int(new_value)   
@@ -841,6 +864,8 @@ def teacher_filter(teachers, attrib_no, attrib_value_inp):
     return filtered_teachers, export_file_name, error_message
 def teacher_attribute_checker(filter_no, new_value):
     # 1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'HOD'
+    department = new_value
+    error_message = None
     if filter_no in [2,4,5]:
         try:
             new_value = int(new_value)
@@ -882,7 +907,7 @@ def student_mark_filter(student_marks, attrib_no, attrib_value_inp):
             if attrib_no == 2:
                 attrib_value = int(attrib_value_inp[1:])
             else:
-                attrib_value = float(attrib_value_inp[1:])
+                attrib_value = int(float(attrib_value_inp[1:])*10)
         except:
             filtered_student_marks = student_marks
             if attrib_no == 2:
@@ -891,11 +916,11 @@ def student_mark_filter(student_marks, attrib_no, attrib_value_inp):
                 error_message = 'Check Input - attrib_value_inp Error\nEg: <5.6'
         else: 
             if attrib_symbol == '>':
-                filtered_student_marks = [student_mark for student_mark in student_marks if (float(student_mark.cgpa) > attrib_value or student_mark.semester > attrib_value)]
+                filtered_student_marks = [student_mark for student_mark in student_marks if (int(float(student_mark.cgpa)*10) > attrib_value or student_mark.semester > attrib_value)]
             elif attrib_symbol == '<':
-                filtered_student_marks = [student_mark for student_mark in student_marks if (float(student_mark.cgpa) < attrib_value or student_mark.semester < attrib_value)]
+                filtered_student_marks = [student_mark for student_mark in student_marks if (int(float(student_mark.cgpa)*10) < attrib_value or student_mark.semester < attrib_value)]
             elif attrib_symbol == '=':
-                filtered_student_marks = [student_mark for student_mark in student_marks if (float(student_mark.cgpa) == attrib_value or student_mark.semester == attrib_value)]
+                filtered_student_marks = [student_mark for student_mark in student_marks if (int(float(student_mark.cgpa)*10) == attrib_value or student_mark.semester == attrib_value)]
             else: 
                 filtered_student_marks = student_marks
                 error_message = 'Check Input: attrib_symbol Error\nEg: =2006'
@@ -916,12 +941,15 @@ def student_mark_filter(student_marks, attrib_no, attrib_value_inp):
     return filtered_student_marks, export_file_name, error_message
 def student_mark_attribute_checker(filter_no, new_value):
     # 1:'Name', 2:'Semester', 3:'Department', 4:'CGPA'
+    department = new_value
+    error_message = None
     if filter_no in [2,4]:
         try:
             if filter_no == 2:
                 new_value = int(new_value)
             else:
                 new_value = float(new_value)
+            
         except:
             if filter_no == 2:
                 error_message = "InputError: Input Interger value between 1-10"
@@ -963,10 +991,19 @@ def read_file(filename):
                 member_data.append(member)
     return member_data
 def write_file(data, filename):
-    with open(filename, 'w') as file:
-        file.write('Name, Roll Number, Date of Birth, Year of Admission, Alumni\n')
-        for member in data:
-            file.write(f'{member.export_data()}\n')
+	header = ''
+	if 'student_data' in filename:
+		header = 'Name, Roll Number, Date of Birth, Year of Admission, Alumni\n'
+	elif 'teacher' in filename:
+		header = 'Name, Gender, Department, Is HOD, Year of Joining\n'
+	elif 'student_marks' in filename:
+		header = 'Name, Semester, Department, CGPA\n'
+	else:
+		print('\nread_file condition in module_database not matched\n')
+	with open(filename, 'w') as file:
+		file.write(header)
+		for member in data:
+			file.write(f'{member.export_data()}\n')
             
 def hash_string(string):
     hash = 0
