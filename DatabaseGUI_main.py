@@ -4,23 +4,15 @@ DATABASE MANAGEMENT SYSTEM
 Features -
  - Nested Filter with exports
  - Department filter using multithreading
- - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI
  - Addition/Modification of data won't rewrite old backup.
- - Filter search optimised using threading (partially implemented in Department filter)
+ - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI
+ - Modify data requires login: Username and password - Admin
  - cache generated during runtime for ease of multithreading (to be implemented)
+ - Filter search optimised using threading (partially implemented in Department filter)
 
 UPDATES - 
 v2.2
 	- Optimisation in filter and attribute_checker
-
-v2.1
-	- Bug fix
-    - Asthetics
-    - Credits 
-
-v2.0
-	- Bug fix and optimisation
-    - Modify data requires login: Username and password - Admin
 
 '''
 
@@ -419,8 +411,11 @@ class StudentDatabaseGUI:
 							elif parameter == 'add':
 								if self.inheritance_manager == 'StudentMarks':
 									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.year_button]
-								else:
+								elif self.inheritance_manager == 'Student':
 									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.year_button, self.alumni_button]
+								else:
+									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.alumni_button, self.year_button]
+
 								new_value = self.user_input
 								error_message, new_value = self.attrib_checker(self.inheritance_manager,filter_no, new_value)
 
@@ -1049,11 +1044,17 @@ def write_file(data, filename):
 			file.write(f'{member.export_data()}\n')
 
 def hash_string(string):
+    '''
+    For Login password hashing
+    '''
     hash = 0
     for char in string:
         hash = (hash * 31 + ord(char)) % 2**32
     return hash
 def worker_filter_department(department_name, student_list, teacher_list):
+    '''
+    Filtering for department members using multithreading
+    '''
     def worker(members_list, department_name, append_to):
         for member in members_list:
             if member.department.lower() == department_name.lower():
@@ -1069,6 +1070,9 @@ def worker_filter_department(department_name, student_list, teacher_list):
 
     return filter_students, filter_teachers
 def split_file_by_lines(source_filename, destination_filename, lines_per_file):
+    ''' 
+    Not implemented yet. To be used for faster filtering using multithreading.
+    '''
     with open(source_filename) as file:
         out_file = None
         next(file)
@@ -1098,4 +1102,4 @@ if __name__=='__main__':
         my_gui = Database_Manager_GUI(root)
         root.mainloop()
 
-        shutil.rmtree('./.cache')               # uncomment to delete cache after each use
+    shutil.rmtree('./.cache')               # uncomment to delete cache after each use
