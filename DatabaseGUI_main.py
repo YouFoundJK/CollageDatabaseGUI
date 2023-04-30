@@ -13,6 +13,7 @@ Features -
 UPDATES - 
 v2.2
 	- Optimisation in filter and attribute_checker
+	- Improved the result asthtics (tabular form using carriage return character)
 
 '''
 
@@ -116,7 +117,7 @@ class CreditsWindowGUI:
         self.master.geometry('800x400')
         self.canvas = tk.Canvas(self.master, width=800, height=400)
         self.canvas.pack()
-        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation"
+        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation\n - Improved the result asthtics (tabular form using carriage return character)"
         self.text_obj = None
         self.after_id = None
         self.y_pos = 500
@@ -217,12 +218,21 @@ class StudentDatabaseGUI:
 			self.button_pressed.set(100)
 			self.entry.delete(0, tk.END) 
 	def print_data_button(self):
+			
 			self.displayed_member_list = read_file(f"./backup/{self.category}_data.csv")		# Required for exporting data
 			self.text_widget.delete('1.0', 'end')
 			self.export_button.pack(side="top", padx=10, pady=5)
-			self.text_widget.insert(tk.END, f'Here is the list of all {self.category}:\n')
+			self.text_widget.insert(tk.END, f'Here is the list of all {self.category}:\n\n')
+
+			if self.members[1].category == 'student_marks':
+				self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+			elif self.members[1].category == 'student':
+				self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150)
+			elif self.members[1].category == 'teacher':
+				self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+			
 			self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.members).join(f'\n\n'))
-			self.text_widget.insert(tk.END, '\n')
+
 			self.text_widget.see(tk.END)
 	def export_data_button(self):
 		self.text_widget.insert(tk.END, "Exporting data...\n")
@@ -359,15 +369,29 @@ class StudentDatabaseGUI:
 									else:
 
 										if parameter == 'filter':
-												self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.displayed_member_list)+'\n\n')
-										
-												self.text_widget.insert(tk.END, f'Select attribute for nested filtering or Export the results.\n')
-												self.export_file_name += export_file_name_temp
-												self.text_widget.see(tk.END)
-												self.main_window.wait_variable(self.button_pressed)
-												break
+											if self.members[1].category == 'student_marks':
+												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+											elif self.members[1].category == 'student':
+												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150)
+											elif self.members[1].category == 'teacher':
+												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+
+											self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.displayed_member_list)+'\n\n')
+									
+											self.text_widget.insert(tk.END, f'Select attribute for nested filtering or Export the results.\n')
+											self.export_file_name += export_file_name_temp
+											self.text_widget.see(tk.END)
+											self.main_window.wait_variable(self.button_pressed)
+											break
 
 										elif parameter == 'narrow down':
+											if self.members[1].category == 'student_marks':
+												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+											elif self.members[1].category == 'student':
+												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150)
+											elif self.members[1].category == 'teacher':
+												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+
 											self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.displayed_member_list)+'\n\n')
 												
 											if len(self.displayed_member_list) != 1:
@@ -657,10 +681,12 @@ class DepartmentDatabaseGUI:
 							
 							self.text_widget.delete('1.0', 'end')
 							self.text_widget.insert(tk.END, f'Students in {filtered_departments[0]}:\n')
+							self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
 							self.text_widget.insert(tk.END, f'\n'.join(str(member) for member in student_list).join(f'\n\n'))
 							self.text_widget.insert(tk.END, '\n')
 							self.text_widget.see(tk.END)
 							self.text_widget.insert(tk.END, f'Teachers in {filtered_departments[0]}:\n')
+							self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
 							self.text_widget.insert(tk.END, '\n'.join(str(member) for member in teacher_list).join(f'\n\n'))
 							self.text_widget.insert(tk.END, '\n')
 							self.text_widget.insert(tk.END, f'Enter new department to filter or export the results.\nFor nested filtering options go to other database.\n')
@@ -743,7 +769,7 @@ class StudentMarks:
         self.department = args[2]
         self.cgpa = args[3]
     def __str__(self):
-        return f"Name: {self.name} Semester: {self.semester} Department: {self.department} CGPA: {self.cgpa}"
+        return f"{self.name}\t\t\t{self.semester}\t{self.department}\t\t{self.cgpa}"
     def export_data(self):
         #Name,Roll Number,Date of Birth,Year of Admission,Alumni
         return f"{self.name},{self.semester},{self.department},{self.cgpa}"
@@ -758,7 +784,7 @@ class Student:
         self.year_of_admission = int(args[3])
         self.alumni = int(args[4])
     def __str__(self):
-        return f"Name: {self.name} Date of Birth: {self.dob} Roll Number: {self.roll_no} Year of Admission: {self.year_of_admission} Alumni: {'Yes' if self.alumni == 1 else 'No'}"
+        return f"{self.name}\t\t\t{self.dob}\t\t{self.roll_no}\t{self.year_of_admission}\t\t{'Yes' if self.alumni == 1 else 'No'}"
     def export_data(self):
         #Name,Roll Number,Date of Birth,Year of Admission,Alumni
         return f"{self.name},{self.roll_no},{self.dob},{self.year_of_admission},{self.alumni}"
@@ -772,7 +798,7 @@ class Teacher:
         self.hod = int(args[3])
         self.year_of_joining = int(args[4])
     def __str__(self):
-        return f"Name: {self.name} Gender: {'M' if self.gender == 1 else 'F'} Department: {self.department} HOD: {'Yes' if self.hod == 1 else 'No'} Year of Joining: {self.year_of_joining}"
+        return f"{self.name}\t\t\t{'M' if self.gender == 1 else 'F'}\t{self.department}\t\t{'Yes' if self.hod == 1 else 'No'}\t{self.year_of_joining}"
     def export_data(self):
         return f"{self.name},{self.gender},{self.department},{self.hod},{self.year_of_joining}"
 
