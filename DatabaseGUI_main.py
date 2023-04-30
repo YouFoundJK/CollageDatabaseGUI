@@ -13,7 +13,7 @@ Features -
 UPDATES - 
 v2.2
 	- Optimisation in filter and attribute_checker
-	- Improved the result asthtics (tabular form using carriage return character)
+	- Improved the result aesthetics (tabular form using carriage return character)
 
 '''
 
@@ -117,7 +117,7 @@ class CreditsWindowGUI:
         self.master.geometry('800x400')
         self.canvas = tk.Canvas(self.master, width=800, height=400)
         self.canvas.pack()
-        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation\n - Improved the result asthtics (tabular form using carriage return character)"
+        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 30 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\n v2.2\n - Optimisation in filter and attribute_checker\n - Improved the result aesthetics (tabular form using carriage return character)\n\nv2.1\n - Bug fix\n - aesthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation\n"
         self.text_obj = None
         self.after_id = None
         self.y_pos = 500
@@ -370,11 +370,11 @@ class StudentDatabaseGUI:
 
 										if parameter == 'filter':
 											if self.members[1].category == 'student_marks':
-												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150+'\n')
 											elif self.members[1].category == 'student':
-												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150+'\n')
 											elif self.members[1].category == 'teacher':
-												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150+'\n')
 
 											self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.displayed_member_list)+'\n\n')
 									
@@ -865,7 +865,7 @@ def member_filter(members, attrib_no, attrib_value_inp):
                 filtered_teachers = members
                 error_message = 'Check Input - attrib_value_inp Error\nEg: =2007'
             else: 
-
+                filtered_teachers = []
                 if attrib_symbol == '>':
                     filtered_teachers = [teacher for teacher in members if teacher.year_of_joining > attrib_value]
                 elif attrib_symbol == '<':
@@ -880,21 +880,23 @@ def member_filter(members, attrib_no, attrib_value_inp):
             attrib_value = attrib_value_inp
 
             if attrib_value:
+                filtered_teachers = []
                 filtered_teachers = [teacher for teacher in members if (attrib_value.lower() in teacher.name.lower() or attrib_value.lower() in teacher.department.lower())]
             else:
                 error_message = 'Check Input: Give a name keyword to filter'
                 if attrib_no == 3:
                     error_message+="\nValid departments are: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
             
-        elif attrib_no in [2,5]:
+        elif attrib_no in [2, 5]:
             attrib_value = attrib_value_inp
 
             if attrib_value.lower() == 'y' or attrib_value.lower() == 'm':
                 attrib_value = 1
-                filtered_teachers = [teacher for teacher in members if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
+                filtered_teachers = [teacher for teacher in members if ((attrib_value == teacher.hod and attrib_no == 5 ) or (attrib_value == teacher.gender and attrib_no == 2 ))]
+		
             elif attrib_value.lower() == 'n' or attrib_value.lower() == 'f':
                 attrib_value = 0
-                filtered_teachers = [teacher for teacher in members if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
+                filtered_teachers = [teacher for teacher in members if ((attrib_value == teacher.hod and attrib_no == 5 ) or (attrib_value == teacher.gender and attrib_no == 2 ))]
             else:
                 if attrib_no == 2:
                     error_message = 'Check Input: attrib_value_inp Error\nEg: "m" or "f"'
@@ -991,7 +993,7 @@ def member_attribute_checker(category, filter_no, new_value):
 						error_message = "InputError: The input value is not a 4 digit integer."
 				elif filter_no in [2, 5]:
 					if new_value not in [0, 1]:
-						error_message = "InputError: The input value is not either 0 or 1."
+						error_message = "InputError: The input value either 0 or 1."
 
 		elif filter_no == 3:
 			departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
