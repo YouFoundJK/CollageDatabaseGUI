@@ -12,7 +12,7 @@ Features -
 
 UPDATES - 
 v3.0
-	- Optimisation in filter and attribute_checker
+	- Improved the result aesthetics (tabular form using carriage return character)
 	
 Read before use - 
     - USERNAME AND PASSWORD for add/modify is Admin
