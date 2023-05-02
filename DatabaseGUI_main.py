@@ -6,15 +6,16 @@ Features -
  - Department filter using multithreading
  - Addition/Modification of data won't rewrite old backup.
  - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI
- - Modify data requires login: Username and password - Admin
  - cache generated during runtime for ease of multithreading (to be implemented)
+ - Modify data requires login: USERNAME AND PASSWORD is Admin implemented using hash
  - Filter search optimised using threading (partially implemented in Department filter)
 
 UPDATES - 
-v2.2
-	- Optimisation in filter and attribute_checker
-	- Improved the result asthtics (tabular form using carriage return character)
-
+v3.0
+	- Improved the result aesthetics (tabular form using carriage return character)
+	
+Read before use - 
+    - USERNAME AND PASSWORD for add/modify is Admin
 '''
 
 import os
@@ -117,7 +118,7 @@ class CreditsWindowGUI:
         self.master.geometry('800x400')
         self.canvas = tk.Canvas(self.master, width=800, height=400)
         self.canvas.pack()
-        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 21 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\nv2.1\n - Bug fix\n - Asthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation\n - Improved the result asthtics (tabular form using carriage return character)"
+        self.text = f"DATABASE MANAGEMENT SYSTEM\n\n\nAuthor: Jovi K\n\nLast Modified: 30 April 2023\nDatabase project commited as part of Coursework.\n\nFeatures -\n - Nested Filter with exports\n - Department filter using multithreading\n - Inheritance used for TeacherDatabaseGUI, StudentMarksGUI\n - Addition/Modification of data won't rewrite old backup.\n - Filter search optimised using threading (partially implemented in Department filter)\n - cache generated during runtime for ease of multithreading (to be implemented)\n\nUPDATES -\n\n v3.0\n - Improved the result aesthetics (tabular form using carriage return character)\n\n v2.2\n - Optimisation in filter and attribute_checker\n\nv2.1\n - Bug fix\n - aesthetics\n - Credits\n\n v2.0\n - Bug fix and optimisation\n"
         self.text_obj = None
         self.after_id = None
         self.y_pos = 500
@@ -141,18 +142,16 @@ class StudentDatabaseGUI:
 	def __init__(self, master, inheritance_parameter = 'Student'):
 			self.main_window = tk.Toplevel(master)
 			# self.main_window = master
-
 			self.user_input = ''
 			self.category = 'student'
 			self.displayed_member_list = None
 			self.export_file_name = f'all_{self.category}_data'
 			self.current_backup_status = 1                              # backup not required
 			self.button_pressed = tk.IntVar()
-			self.filter = member_filter 
-			self.attrib_checker = member_attribute_checker
+			self.filter = member_filter                                 # used for filtering
+			self.attrib_checker = member_attribute_checker              # used to check
 			self.filter_name = {1:'Name', 2:'Roll No', 3:'Year of birth', 4:'Year of Admission', 5:'Is Alumni'}
 			self.inheritance_manager = inheritance_parameter		# 'Student', 'Teacher', 'StudentMarks'
-
 			self.main_window.title("Student Database")
 			self.main_window.geometry("1200x652")
 			style = ttk.Style()
@@ -161,7 +160,6 @@ class StudentDatabaseGUI:
 
 			self.button_frame = ttk.Frame(self.main_window)
 			self.button_frame.pack(side="top", fill="x", expand=False)
-
 			self.print_button = ttk.Button(self.button_frame, text="Display All Data", command=self.print_data_button)
 			self.filter_button = ttk.Button(self.button_frame, text="Search/filter data", command=lambda: self.new_interface('filter'))
 			self.export_button = ttk.Button(self.button_frame, text="Export Data", command=self.export_data_button)
@@ -370,11 +368,11 @@ class StudentDatabaseGUI:
 
 										if parameter == 'filter':
 											if self.members[1].category == 'student_marks':
-												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150+'\n')
 											elif self.members[1].category == 'student':
-												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150+'\n')
 											elif self.members[1].category == 'teacher':
-												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150+'\n')
 
 											self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.displayed_member_list)+'\n\n')
 									
@@ -386,11 +384,11 @@ class StudentDatabaseGUI:
 
 										elif parameter == 'narrow down':
 											if self.members[1].category == 'student_marks':
-												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150+'\n')
 											elif self.members[1].category == 'student':
-												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tDOB\t\tRoll No.\tYr of Admission\t\tAlumni\n'+'-'*150+'\n')
 											elif self.members[1].category == 'teacher':
-												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+												self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150+'\n')
 
 											self.text_widget.insert(tk.END, '\n'.join(str(member) for member in self.displayed_member_list)+'\n\n')
 												
@@ -438,7 +436,7 @@ class StudentDatabaseGUI:
 								elif self.inheritance_manager == 'Student':
 									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.year_button, self.alumni_button]
 								else:
-									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.alumni_button, self.year_button]
+									button_unpack = [self.name_button, self.roll_no_button, self.dob_button, self.year_button, self.alumni_button]
 
 								new_value = self.user_input
 								error_message, new_value = self.attrib_checker(self.inheritance_manager,filter_no, new_value)
@@ -547,6 +545,7 @@ class TeacherDatabaseGUI(StudentDatabaseGUI):       # Inherited from StudentData
 		
 		self.category = 'teacher'
 		self.main_window.title("Staff Database")
+		
 		self.filter_name = {1:'Name', 2:'Gender', 3:'Department', 4:'Year of Joining', 5:'Is HOD'}
 
 		self.name_button = ttk.Button(self.button_frame, text="Name", command=lambda:self.button_pressed.set(1))
@@ -556,12 +555,6 @@ class TeacherDatabaseGUI(StudentDatabaseGUI):       # Inherited from StudentData
 		self.alumni_button = ttk.Button(self.button_frame, text="HOD", command=lambda:self.button_pressed.set(5))
 		
 		self.init_packing()
-	def close_window(self):
-		self.button_pressed.set(110)
-		self.main_window.destroy()
-		if self.current_backup_status == 0:
-			index = len([filename for filename in os.listdir('./backup') if filename.startswith(f'{self.category}_data')])
-			write_file(self.members, f'./backup/{self.category}_data_{index}.csv')
 class StudentMarksGUI(StudentDatabaseGUI):       	# Inherited from StudentDatabaseGUI
 	def __init__(self, master):
 		super().__init__(master, 'StudentMarks')
@@ -577,12 +570,6 @@ class StudentMarksGUI(StudentDatabaseGUI):       	# Inherited from StudentDataba
 		self.alumni_button = ttk.Button(self.button_frame, text="HOD", command=lambda:self.button_pressed.set(5))
 		
 		self.init_packing()
-	def close_window(self):
-		self.button_pressed.set(110)
-		self.main_window.destroy()
-		if self.current_backup_status == 0:
-			index = len([filename for filename in os.listdir('./backup') if filename.startswith(f'{self.category}_data')])
-			write_file(self.members, f'./backup/{self.category}_data_{index}.csv')
 class DepartmentDatabaseGUI:
 	def __init__(self, master):
 		self.main_window = tk.Toplevel(master)
@@ -681,12 +668,12 @@ class DepartmentDatabaseGUI:
 							
 							self.text_widget.delete('1.0', 'end')
 							self.text_widget.insert(tk.END, f'Students in {filtered_departments[0]}:\n')
-							self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150)
+							self.text_widget.insert(tk.END, f'Name\t\t\tSemester\tDepartment\t\tCGPA\n'+'-'*150+'\n')
 							self.text_widget.insert(tk.END, f'\n'.join(str(member) for member in student_list).join(f'\n\n'))
 							self.text_widget.insert(tk.END, '\n')
 							self.text_widget.see(tk.END)
 							self.text_widget.insert(tk.END, f'Teachers in {filtered_departments[0]}:\n')
-							self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150)
+							self.text_widget.insert(tk.END, f'Name\t\t\tGender\tDepartment\t\tHOD\tYear of Joining\n'+'-'*150+'\n')
 							self.text_widget.insert(tk.END, '\n'.join(str(member) for member in teacher_list).join(f'\n\n'))
 							self.text_widget.insert(tk.END, '\n')
 							self.text_widget.insert(tk.END, f'Enter new department to filter or export the results.\nFor nested filtering options go to other database.\n')
@@ -865,7 +852,7 @@ def member_filter(members, attrib_no, attrib_value_inp):
                 filtered_teachers = members
                 error_message = 'Check Input - attrib_value_inp Error\nEg: =2007'
             else: 
-
+                filtered_teachers = []
                 if attrib_symbol == '>':
                     filtered_teachers = [teacher for teacher in members if teacher.year_of_joining > attrib_value]
                 elif attrib_symbol == '<':
@@ -880,21 +867,23 @@ def member_filter(members, attrib_no, attrib_value_inp):
             attrib_value = attrib_value_inp
 
             if attrib_value:
+                filtered_teachers = []
                 filtered_teachers = [teacher for teacher in members if (attrib_value.lower() in teacher.name.lower() or attrib_value.lower() in teacher.department.lower())]
             else:
                 error_message = 'Check Input: Give a name keyword to filter'
                 if attrib_no == 3:
                     error_message+="\nValid departments are: 'Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology'"
             
-        elif attrib_no in [2,5]:
+        elif attrib_no in [2, 5]:
             attrib_value = attrib_value_inp
 
             if attrib_value.lower() == 'y' or attrib_value.lower() == 'm':
                 attrib_value = 1
-                filtered_teachers = [teacher for teacher in members if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
+                filtered_teachers = [teacher for teacher in members if ((attrib_value == teacher.hod and attrib_no == 5 ) or (attrib_value == teacher.gender and attrib_no == 2 ))]
+		
             elif attrib_value.lower() == 'n' or attrib_value.lower() == 'f':
                 attrib_value = 0
-                filtered_teachers = [teacher for teacher in members if (attrib_value == teacher.hod or attrib_value == teacher.gender)]
+                filtered_teachers = [teacher for teacher in members if ((attrib_value == teacher.hod and attrib_no == 5 ) or (attrib_value == teacher.gender and attrib_no == 2 ))]
             else:
                 if attrib_no == 2:
                     error_message = 'Check Input: attrib_value_inp Error\nEg: "m" or "f"'
@@ -991,7 +980,7 @@ def member_attribute_checker(category, filter_no, new_value):
 						error_message = "InputError: The input value is not a 4 digit integer."
 				elif filter_no in [2, 5]:
 					if new_value not in [0, 1]:
-						error_message = "InputError: The input value is not either 0 or 1."
+						error_message = "InputError: The input value either 0 or 1."
 
 		elif filter_no == 3:
 			departments = ['Computer Science', 'Mathematics', 'Physics', 'Chemistry', 'Biology', 'English', 'History', 'Economics', 'Psychology', 'Sociology']
@@ -1036,7 +1025,6 @@ def member_attribute_checker(category, filter_no, new_value):
 		return error_message, department        
 
 def read_file(filename):
-    Member = None
     if 'student_data' in filename:
         Member = Student
     elif 'teacher' in filename:
@@ -1044,7 +1032,7 @@ def read_file(filename):
     elif 'student_marks' in filename:
         Member = StudentMarks
     else:
-        print('\nread_file condition in module_database not matched\n')
+        print('\nread_file condition not matched\n')
     if Member:
         member_data = []
         with open(filename, mode='r') as file:
@@ -1111,10 +1099,8 @@ def split_file_by_lines(source_filename, destination_filename, lines_per_file):
         if out_file:
             out_file.close()
 
-
 if __name__=='__main__':
     [directory for directory in ['./export', './.cache', './backup'] if not os.path.exists(directory) and os.makedirs(directory, exist_ok=True)]
-
     file_paths = ['./backup/department_info.csv', './backup/student_data.csv', './backup/student_marks_data.csv', './backup/teacher_data.csv']
 
     exitcode = 0
@@ -1122,10 +1108,8 @@ if __name__=='__main__':
         if not os.path.exists(file_path):
             print(f"{file_path} does not exist.")
             exitcode = 1
-
     if exitcode == 0:
         root = tk.Tk()
         my_gui = Database_Manager_GUI(root)
         root.mainloop()
-
     shutil.rmtree('./.cache')               # uncomment to delete cache after each use
